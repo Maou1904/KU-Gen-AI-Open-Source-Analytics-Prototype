@@ -1,18 +1,34 @@
 import pandas as pd
-from textblob import TextBlob
+try:
+    from textblob import TextBlob
+    _HAS_TEXTBLOB = True
+except Exception:
+    _HAS_TEXTBLOB = False
 
 def analyze_sentiment(text):
     #No Top-up
     if not isinstance(text, str) or text == "Top-up":
         return "Neutral"
-        
-    # แปลงให้เป็น TextBlob
-    blob = TextBlob(text)
-    pol = blob.sentiment.polarity
+    # ถ้ามี TextBlob ใช้ sentiment polarity
+    if _HAS_TEXTBLOB:
+        blob = TextBlob(text)
+        pol = blob.sentiment.polarity
+        if pol > 0:
+            return "Positive"
+        elif pol < 0:
+            return "Negative"
+        else:
+            return "Neutral"
 
-    if pol > 0:
+    # Fallback: simple keyword-based polarity
+    txt = text.lower()
+    positive_keywords = {"good", "great", "success", "helpful", "positive", "love", "excellent", "nice"}
+    negative_keywords = {"bad", "error", "fail", "failed", "angry", "poor", "negative", "problem", "error"}
+    pos = sum(1 for w in positive_keywords if w in txt)
+    neg = sum(1 for w in negative_keywords if w in txt)
+    if pos > neg:
         return "Positive"
-    elif pol < 0:
+    elif neg > pos:
         return "Negative"
     else:
         return "Neutral"

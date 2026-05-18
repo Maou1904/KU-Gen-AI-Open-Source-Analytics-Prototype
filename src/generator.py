@@ -141,13 +141,8 @@ def generate_mock_data(num_records=1200):
         }
         data_list.append(record)
         
-    # -------------------------------------------------------------
-    # STEP 4: แปลงเป็น DataFrame และจัดระเบียบข้อมูลก่อนส่งออก
-    # -------------------------------------------------------------
     df = pd.DataFrame(data_list)
     df = df.sort_values(by="Timestamp").reset_index(drop=True)
-    
-    # TODO: สั่งเรียงลำดับข้อมูลตามเวลา (Timestamp) เพื่อให้เหมือนไฟล์ Log ของจริง
     
     return df
 
