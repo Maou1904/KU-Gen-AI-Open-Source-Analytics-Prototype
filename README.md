@@ -22,6 +22,7 @@
    streamlit run src/app.py
    ```
 3. ถ้าต้องการรีเฟรชข้อมูลใหม่ ให้รัน `generator.py` ก่อนแล้วค่อยรัน dashboard อีกครั้ง.
+4. หรือเข้าผ่าน link ที่ deploy แล้ว https://ku-gen-ai-prototype.streamlit.app/
 
 ## โครงสร้างของโปรเจกต์ (Project Structure)
 
