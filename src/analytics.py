@@ -103,6 +103,7 @@ def run_analytics_pipeline():
     print(f"   - Failure Rate: {analytics['failure_rate']:.2%}")
     print(f"   - Average Token Used: {analytics['avg_token_used']:.2f}")
     print(f"   - Average Processing Time: {analytics['avg_processing_time']:.2f} seconds")
+    print(f"   - Top Tags: {list(analytics['top_tags'].keys())[:5]}")
 
     print("[2/4] Running Sentiment Analysis...")
     print("   - Sentiment Distribution:")

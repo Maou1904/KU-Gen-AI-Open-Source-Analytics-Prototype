@@ -7,9 +7,6 @@ import streamlit as st
 
 from analytics import run_analytics_pipeline, compute_analytics_from_df
 
-# -------------------------------------------------------------
-# Dark green dashboard inspired by the provided HTML design
-# -------------------------------------------------------------
 st.set_page_config(
     page_title="University Insights Dashboard",
     page_icon="🟢",
@@ -186,6 +183,20 @@ st.markdown(
         .custom-legend strong {
             color: #b9ccb2;
         }
+
+        .flex-inline {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .text-Bold {
+            color: #00d900;
+            font-size: 1.2rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-right: 8px;
+        }
     </style>
     """,
     unsafe_allow_html=True,
@@ -214,6 +225,27 @@ selected_faculty = st.sidebar.selectbox(
     index=0,
     key="selected_faculty",
 )
+
+# Get departments for selected faculty
+if selected_faculty == "All":
+    available_departments = sorted(df["Department"].dropna().unique().tolist())
+else:
+    available_departments = sorted(df[df["Faculty"] == selected_faculty]["Department"].dropna().unique().tolist())
+
+selected_department = st.sidebar.selectbox(
+    "Department",
+    options=["All"] + available_departments,
+    index=0,
+    key="selected_department",
+)
+
+selected_role = st.sidebar.selectbox(
+    "Role",
+    options=["All"] + sorted(df["Role"].dropna().unique().tolist()),
+    index=0,
+    key="selected_role",
+)
+
 selected_transaction = st.sidebar.selectbox(
     "Transaction Type",
     options=["All"] + sorted(df["TransactionType"].dropna().unique().tolist()),
@@ -315,6 +347,10 @@ if selected_campus != "All":
     filtered_df = filtered_df[filtered_df["Campus"] == selected_campus]
 if selected_faculty != "All":
     filtered_df = filtered_df[filtered_df["Faculty"] == selected_faculty]
+if selected_department != "All":
+    filtered_df = filtered_df[filtered_df["Department"] == selected_department]
+if selected_role != "All":
+    filtered_df = filtered_df[filtered_df["Role"] == selected_role]
 if selected_transaction != "All":
     filtered_df = filtered_df[filtered_df["TransactionType"] == selected_transaction]
 
@@ -354,7 +390,7 @@ st.markdown(
     "<div class='dashboard-header'>"
     "<div class='left'>"
     "<div class='title-top'>University Insights</div>"
-    "<div class='subtitle-top'>Command Center for AI usage and academic analytics</div>"
+    "<div class='subtitle-top'>Dashboard for AI usage and academic analytics</div>"
     "</div>"
     "<div class='right'>"
     "<button class='dashboard-button'>Download Reports</button>"
@@ -363,7 +399,19 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-st.markdown("<div class='small-pill'><span class='pill-dot'></span>Dark green analytics theme</div>", unsafe_allow_html=True)
+
+
+topics = ""
+
+for _ in list(analytics['top_tags'].keys())[:5]:
+    topics += f"<div class='small-pill'><span class='pill-dot'></span>{_}</div>\n"
+
+st.markdown(f"""
+<div class='flex-inline'>
+    <div class='text-Bold'>Top Topics</div>
+    {topics}
+</div>
+""", unsafe_allow_html=True)
 st.markdown("---")
 
 # Top metrics
@@ -442,7 +490,7 @@ with col_a:
         template='plotly_dark',
     )
     fig_faculty.update_layout(
-        height=50*len(faculty_usage),
+        height=70*len(faculty_usage),
         plot_bgcolor='rgba(19,19,19,0.85)',
         paper_bgcolor='rgba(19,19,19,0.85)',
         font_color='#e5e2e1',
@@ -488,7 +536,7 @@ with col_b:
         template='plotly_dark',
     )
     fig_apps.update_layout(
-        height=50*len(app_usage),
+        height=70*len(app_usage),
         plot_bgcolor='rgba(19,19,19,0.85)',
         paper_bgcolor='rgba(19,19,19,0.85)',
         font_color='#e5e2e1',
@@ -499,36 +547,31 @@ with col_b:
 st.markdown("---")
 
 # Lower info panels
-row1, row2, row3 = st.columns([1, 1, 1])
-
-with row1:
-    st.markdown("<div class='glass-panel chart-card'>"
-                "<div class='section-header'>Recent Actions</div>"
-                "<div class='custom-legend'>"
-                "<div><span><span class='pill-dot'></span>Copied</span><strong>2.4k</strong></div>"
-                "<div><span><span class='pill-dot' style='background:#4fdc8d'></span>Saved</span><strong>4.2k</strong></div>"
-                "<div><span><span class='pill-dot' style='background:#7bcf5c'></span>Shared</span><strong>1.8k</strong></div>"
-                "</div>"
-                "</div>", unsafe_allow_html=True)
-
-with row2:
-    st.markdown("<div class='glass-panel chart-card'>"
-                "<div class='section-header'>Top Tags</div>"
-                "<div class='small-pill'>Research</div>"
-                "<div class='small-pill'>Digital Marketing</div>"
-                "<div class='small-pill'>Data Science</div>"
-                "<div class='small-pill'>Python Programming</div>"
-                "</div>", unsafe_allow_html=True)
-
-with row3:
-    st.markdown("<div class='glass-panel chart-card'>"
-                "<div class='section-header'>Live Insight</div>"
-                "<p style='color:#b9ccb2;margin-bottom:16px;'>Active data feed and model performance summary available.</p>"
-                "<div class='small-pill'>" 
-                "<span class='pill-dot'></span>Streaming analytics ready</div>"
-                "<div class='small-pill' style='margin-top:12px;'>" 
-                "<span class='pill-dot' style='background:#00b23f'></span>Recommendations active</div>"
-                "</div>", unsafe_allow_html=True)
+metric_1, metric_2, metric_3 = st.columns(3)
+metric_1.markdown(
+    "<div class='metric-card card-border-left'>"
+    "<div class='metric-label'>Total Copies</div>"
+    f"<div class='metric-value'>{analytics['copy_count']:,}</div>"
+    "<div class='metric-note'>Data points collected</div>"
+    "</div>",
+    unsafe_allow_html=True,
+)
+metric_2.markdown(
+    "<div class='metric-card card-border-left'>"
+    "<div class='metric-label'>Total Saves</div>"
+    f"<div class='metric-value'>{analytics['save_count']:,}</div>"
+    "<div class='metric-note'>Data points collected</div>"
+    "</div>",
+    unsafe_allow_html=True,
+)
+metric_3.markdown(
+    "<div class='metric-card card-border-left'>"
+    "<div class='metric-label'>Total Shares</div>"
+    f"<div class='metric-value'>{analytics['share_count']:,}</div>"
+    "<div class='metric-note'>Data points collected</div>"
+    "</div>",
+    unsafe_allow_html=True,
+)
 
 st.markdown("---")
 
