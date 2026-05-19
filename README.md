@@ -1,7 +1,6 @@
 # KU Gen AI - Open Source Analytics Prototype
 
 ## วิธีติดตั้ง (Installation)
-
 1. เปิดเทอร์มินัลในโฟลเดอร์โปรเจกต์:
    ```bash
    cd KU-Gen-AI-Open-Source-Analytics-Prototype
@@ -9,6 +8,15 @@
 2. ติดตั้ง dependencies จากไฟล์ `requirements.txt`:
    ```bash
    pip install -r requirements.txt
+   ```
+## วิธีเปิดผ่าน Docker
+1. เปิดเทอร์มินัลในโฟลเดอร์โปรเจกต์:
+   ```bash
+   docker compose up --build -d
+   ```
+2. เข้า Website:
+   ```bash
+   http://localhost:8501/
    ```
 
 ## วิธีรันโปรเจกต์ (How to run)
