@@ -1,96 +1,124 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-from pathlib import Path
 
-from analytics import run_analytics_pipeline
+# -------------------------------------------------------------
+# STEP 0: ตั้งค่าหน้าเว็บเริ่มต้น (ต้องอยู่บรรทัดแรกสุดของ Streamlit เสมอ)
+# -------------------------------------------------------------
+st.set_page_config(
+    page_title="KU Gen AI - Open Source Analytics Prototype",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
+# -------------------------------------------------------------
+# STEP 1: โหลดข้อมูลที่ผ่านการประมวลผลแล้ว
+# -------------------------------------------------------------
+@st.cache_data
+def load_processed_data():
+    # ดึงไฟล์ที่มาจากการรัน pipeline ล่าสุดของคุณ
+    df = pd.read_csv("data/processed_analytics_data.csv")
+    df['Timestamp'] = pd.to_datetime(df['Timestamp'])
+    return df
 
-st.set_page_config(page_title="KU AI Usage Dashboard", layout="wide")
+df = load_processed_data()
 
-st.title("KU AI Usage — Interactive Dashboard")
+# -------------------------------------------------------------
+# STEP 2: ตัวกรองข้อมูลแถบข้าง (Sidebar Filters) -> ตรงตามข้อกำหนด Optional
+# -------------------------------------------------------------
+st.sidebar.title("🔍 ตัวกรองระบบ (Filters)")
 
-DATA_PATH = Path("data/processed_analytics_data.csv")
+# 2.1 ตัวกรองวิทยาเขต (Campus)
+campuses = ["All"] + list(df['Campus'].unique())
+selected_campus = st.sidebar.selectbox("วิทยาเขต", options=campuses)
 
+# 2.2 ตัวกรองคณะ (Faculty)
+faculties = ["All"] + list(df['Faculty'].unique())
+selected_faculty = st.sidebar.selectbox("คณะ", options=faculties)
 
-@st.cache_data(ttl=300)
-def load_data():
-    if not DATA_PATH.exists():
-        run_analytics_pipeline()
-    return pd.read_csv(DATA_PATH, parse_dates=["Timestamp"]) 
+# 2.3 ตัวกรองระดับการศึกษา (Education Level)
+edu_levels = ["All"] + [level for level in df['EducationLevel'].unique()]
+selected_edu = st.sidebar.selectbox("ระดับการศึกษา", options=edu_levels)
 
+# ลอจิกการกรองข้อมูลแบบ Dynamic ผูกสัมพันธ์ตามปุ่มที่เลือก
+filtered_df = df.copy()
+if selected_campus != "All":
+    filtered_df = filtered_df[filtered_df['Campus'] == selected_campus]
+if selected_faculty != "All":
+    filtered_df = filtered_df[filtered_df['Faculty'] == selected_faculty]
+if selected_edu != "All":
+    filtered_df = filtered_df[filtered_df['EducationLevel'] == selected_edu]
 
-df = load_data()
-analytics = run_analytics_pipeline() if st.sidebar.button("Recompute analytics") else None
-if analytics is None:
-    # load precomputed analytics from analytics.run_analytics_pipeline side-effect
-    try:
-        import json
-        # fallback: compute minimal analytics from df
-        analytics = {
-            'total_records': len(df),
-            'usage_rate': float((df['TransactionType'] == 'Usage').sum()) / len(df) if len(df) else 0.0,
-            'avg_token_used': float(pd.to_numeric(df['TokenUsed'], errors='coerce').fillna(0).mean()),
-            'daily_token_usage': df[df['TransactionType']=='Usage'].groupby(df['Timestamp'].dt.date)['TokenUsed'].sum().to_dict(),
-            'top_faculty_token_usage': df[df['TransactionType']=='Usage'].groupby('Faculty')['TokenUsed'].sum().sort_values(ascending=False).to_dict(),
-            'transaction_counts': df['TransactionType'].value_counts().to_dict(),
-            'sentiment_counts': df.get('Sentiment', pd.Series()).value_counts().to_dict() if 'Sentiment' in df.columns else {},
-            'top_tags': {},
-        }
-    except Exception:
-        analytics = {}
+# แยกตารางสำหรับเอาไปคิดค่าสถิติฝั่ง Usage และ Top-up เหมือนใน pipeline ของคุณ
+usage_df = filtered_df[filtered_df["TransactionType"] == "Usage"]
 
+# -------------------------------------------------------------
+# STEP 3: ส่วนหัวแดชบอร์ดและ Metric Cards (สรุปตัวเลขสำคัญ)
+# -------------------------------------------------------------
+st.title("🎓 KU Gen AI - Open Source Analytics Prototype")
+st.caption("ระบบต้นแบบรายงานผลสถิติและพฤติกรรมการใช้งานโมเดลปัญญาประดิษฐ์ในมหาวิทยาลัย")
+st.markdown("---")
 
-st.sidebar.header("Controls")
-st.sidebar.write("Data rows: ", len(df))
-st.sidebar.write("Last timestamp:", df['Timestamp'].max())
+# แบ่งพื้นที่แสดงการ์ดสรุปตัวเลข 4 กล่องสี่เหลี่ยมเรียงหน้ากระดาน
+m_col1, m_col2, m_col3, m_col4 = st.columns(4)
 
-# Metrics row
-col1, col2, col3, col4 = st.columns(4)
-col1.metric("Total Records", analytics.get('total_records', 0))
-col2.metric("Usage Rate", f"{analytics.get('usage_rate',0):.2%}")
-col3.metric("Avg Token / Usage", f"{analytics.get('avg_token_used',0):.1f}")
-col4.metric("Unique Users", df['UserID'].nunique())
-
-
-with st.expander("Line — Daily Token Usage"):
-    daily = pd.Series(analytics.get('daily_token_usage', {})).sort_index()
-    if not daily.empty:
-        daily_df = daily.reset_index()
-        daily_df.columns = ['date', 'tokens']
-        fig = px.line(daily_df, x='date', y='tokens', title='Daily Token Usage')
-        fig.update_layout(xaxis_title='Date', yaxis_title='Tokens')
-        st.plotly_chart(fig, width='stretch')
-    else:
-        st.info("No daily token usage data available")
-
-with st.expander("Bar — Token Usage by Faculty"):
-    faculty = analytics.get('top_faculty_token_usage', {})
-    if faculty:
-        fac_df = pd.DataFrame.from_dict(faculty, orient='index', columns=['tokens']).reset_index().rename(columns={'index':'faculty'})
-        fig = px.bar(fac_df, x='faculty', y='tokens', title='Token Usage by Faculty')
-        st.plotly_chart(fig, width='stretch')
-    else:
-        st.info("No faculty token data available")
-
-with st.expander("Pie — Transaction Type Distribution"):
-    trans = analytics.get('transaction_counts', {})
-    if trans:
-        trans_df = pd.DataFrame.from_dict(trans, orient='index', columns=['count']).reset_index().rename(columns={'index':'transaction'})
-        fig = px.pie(trans_df, names='transaction', values='count', title='Transaction Types')
-        st.plotly_chart(fig, width='stretch')
-    else:
-        st.info("No transaction data available")
-
-with st.expander("Bar — Top Tags"):
-    tags = analytics.get('top_tags', {})
-    if tags:
-        tags_df = pd.DataFrame.from_dict(tags, orient='index', columns=['count']).reset_index().rename(columns={'index':'tag'})
-        fig = px.bar(tags_df, x='count', y='tag', orientation='h', title='Top Tags')
-        st.plotly_chart(fig, width='stretch')
-    else:
-        st.info("No tag data available")
+with m_col1:
+    st.metric(label="จำนวนผู้ใช้งานที่ไม่ซ้ำ (Unique Users)", value=filtered_df['UserID'].nunique())
+with m_col2:
+    total_tokens = usage_df['TokenUsed'].sum() if not usage_df.empty else 0
+    st.metric(label="ปริมาณ Token ที่ใช้รวม", value=f"{total_tokens:,}")
+with m_col3:
+    avg_proc = usage_df['ProcessingTime'].mean() if not usage_df.empty else 0.0
+    st.metric(label="เวลาประมวลผลเฉลี่ย (วินาที)", value=f"{avg_proc:.2f} s")
+with m_col4:
+    # คำนวณหา Success Rate แบบสดๆ ตามข้อมูลที่กรอง
+    success_count = len(filtered_df[filtered_df['Status'] == 'Success'])
+    success_rate = (success_count / len(filtered_df)) if len(filtered_df) > 0 else 0.0
+    st.metric(label="อัตราความสำเร็จของระบบ", value=f"{success_rate:.2%}")
 
 st.markdown("---")
-st.subheader("Raw data sample")
-st.dataframe(df.head(200))
+
+# -------------------------------------------------------------
+# STEP 4: การจัดวางและวาดกราฟ (ความต้องการบังคับ: กราฟไม่น้อยกว่า 4 ประเภท)
+# -------------------------------------------------------------
+# แถวกราฟที่ 1: วิเคราะห์แนวโน้มกับความรู้สึก
+chart_row1_col1, chart_row1_col2 = st.columns(2)
+
+with chart_row1_col1:
+    st.write("### 📈 แนวโน้มกิจกรรมการใช้งาน (Line Chart)")
+    # TODO: สรุปข้อมูลรายวันจาก filtered_df แล้วใช้ px.line() พลอตกราฟเส้น
+    # ตัวอย่าง: daily_data = filtered_df.groupby(filtered_df['Timestamp'].dt.date).size().reset_index(name='Count')
+    # fig_line = px.line(daily_data, x='Timestamp', y='Count', labels={'Count': 'จำนวนรายการ'})
+    # st.plotly_chart(fig_line, use_container_width=True)
+
+with chart_row1_col2:
+    st.write("### 🍩 สัดส่วนความรู้สึกจาก Prompt (Pie/Donut Chart)")
+    # TODO: ใช้ px.pie() หรือ px.donut() ดึงคอลัมน์ 'Sentiment' มาพลอตแบ่งกลุ่มความรู้สึก
+    # fig_pie = px.pie(filtered_df, names='Sentiment', hole=0.4)
+    # st.plotly_chart(fig_pie, use_container_width=True)
+
+# แถวกราฟที่ 2: วิเคราะห์โครงสร้างหน่วยงานและฟีเจอร์เด็ด
+chart_row2_col1, chart_row2_col2 = st.columns(2)
+
+with chart_row2_col1:
+    st.write("### 🏛️ สถิติการใช้งานแยกตามภาควิชา (Bar Chart)")
+    # TODO: ใช้ px.bar() ดึงคอลัมน์ 'Department' มานับจำนวนครั้งที่เรียกใช้
+    # dept_counts = usage_df['Department'].value_counts().reset_index(name='Counts')
+    # fig_bar = px.bar(dept_counts, x='Department', y='Counts', color='Department')
+    # st.plotly_chart(fig_bar, use_container_width=True)
+
+with chart_row2_col2:
+    st.write("### 📲 สัดส่วนการเลือกใช้ Micro Apps (Bar Chart/Pie)")
+    # TODO: ดึงคอลัมน์ 'AppUsed' (หรือ AppUsed ตามชื่อหัวคอลัมน์ตารางคุณ) มาส่องสถิติความนิยม
+    # app_counts = usage_df['AppUsed'].value_counts().reset_index(name='Calls')
+    # fig_app = px.bar(app_counts, x='Calls', y='AppUsed', orientation='h')
+    # st.plotly_chart(fig_app, use_container_width=True)
+
+st.markdown("---")
+
+# -------------------------------------------------------------
+# STEP 5: ตารางแสดงข้อมูลดิบ (Log Viewer)
+# -------------------------------------------------------------
+st.write("### 📋 ตารางประวัติบันทึกการใช้งาน (Data Log Viewer)")
+# แสดงตาราง DataFrame ที่ผ่านการ Filter เรียบร้อยแล้วให้ผู้ตรวจสามารถกดค้นหาหรือดาวน์โหลดได้
+st.dataframe(filtered_df, use_container_width=True)

@@ -1,34 +1,17 @@
 import pandas as pd
-try:
-    from textblob import TextBlob
-    _HAS_TEXTBLOB = True
-except Exception:
-    _HAS_TEXTBLOB = False
+from textblob import TextBlob
+
 
 def analyze_sentiment(text):
     #No Top-up
     if not isinstance(text, str) or text == "Top-up":
         return "Neutral"
-    # ถ้ามี TextBlob ใช้ sentiment polarity
-    if _HAS_TEXTBLOB:
-        blob = TextBlob(text)
-        pol = blob.sentiment.polarity
-        if pol > 0:
-            return "Positive"
-        elif pol < 0:
-            return "Negative"
-        else:
-            return "Neutral"
-
-    # Fallback: simple keyword-based polarity
-    txt = text.lower()
-    positive_keywords = {"good", "great", "success", "helpful", "positive", "love", "excellent", "nice"}
-    negative_keywords = {"bad", "error", "fail", "failed", "angry", "poor", "negative", "problem", "error"}
-    pos = sum(1 for w in positive_keywords if w in txt)
-    neg = sum(1 for w in negative_keywords if w in txt)
-    if pos > neg:
+    
+    blob = TextBlob(text)
+    pol = blob.sentiment.polarity
+    if pol > 0:
         return "Positive"
-    elif neg > pos:
+    elif pol < 0:
         return "Negative"
     else:
         return "Neutral"
@@ -145,6 +128,7 @@ def run_analytics_pipeline():
     processed_path = "data/processed_analytics_data.csv"
     df.to_csv(processed_path, index=False)
     print(f"✅ Analytics completed! Processed data saved to {processed_path}")
+
 
     return analytics
 

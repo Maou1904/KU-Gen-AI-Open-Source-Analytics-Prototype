@@ -81,7 +81,7 @@ def generate_mock_data(num_records=1200):
         if role == "Student":
             education_level = random.choices(["ป.ตรี", "ป.โท", "ป.เอก"], weights=[0.6, 0.25, 0.15])[0]
         else:
-            education_level = "N/A"
+            education_level = "อาจารย์ / บุคลากร"
         
         # 2.4 ลอจิกการแบ่งประเภทธุรกรรม (Usage vs Top-up)
         # TODO: สุ่มเลือกว่าแถวนี้จะเป็นการใช้งาน AI หรือการเติมเงิน
