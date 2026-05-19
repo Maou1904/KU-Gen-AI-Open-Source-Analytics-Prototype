@@ -9,7 +9,7 @@
    ```bash
    pip install -r requirements.txt
    ```
-## วิธีเปิดผ่าน Docker
+## แบบ Docker
 1. เปิดเทอร์มินัลในโฟลเดอร์โปรเจกต์:
    ```bash
    docker compose up --build -d
@@ -36,18 +36,18 @@
 
 ```text
 KU-Gen-AI-Open-Source-Analytics-Prototype/
-│
-├── data/                               # โฟลเดอร์เก็บข้อมูลของระบบ
-│   ├── mock_data.csv                   # ข้อมูลดิบที่ได้จากการสุ่ม (Phase 1)
-│   └── processed_analytics_data.csv    # ข้อมูลที่ผ่านการคลีนและวิเคราะห์ความรู้สึกแล้ว (Phase 2)
-│
-├── src/                                # โฟลเดอร์เก็บซอร์สโค้ดหลัก
-│   ├── generator.py                    # สคริปต์สร้างข้อมูลจำลอง mock data
-│   ├── analytics.py                    # ท่อประมวลผลข้อมูล คลีน type และทำ Sentiment Analysis
-│   └── app.py                          # โค้ดหน้าจอ Interactive Dashboard ด้วย Streamlit
-│
-├── README.md                           # คู่มือการติดตั้งและใช้งานโปรเจกต์ (ไฟล์นี้)
-└── requirements.txt                    # รายการ Library ทั้งหมดที่โปรเจกต์จำเป็นต้องใช้
+├── data/                               # ข้อมูลตัวอย่างและข้อมูลที่ผ่านการประมวลผล
+│   ├── mock_data.csv                   # ข้อมูลจำลองที่สร้างด้วย generator.py
+│   └── processed_analytics_data.csv    # ข้อมูลที่ผ่านการวิเคราะห์แล้วจาก analytics.py
+├── src/                                # ซอร์สโค้ดหลักของโปรเจกต์
+│   ├── analytics.py                    # ฟังก์ชันวิเคราะห์ข้อมูลและคำนวณสถิติ
+│   ├── app.py                          # Streamlit dashboard entrypoint
+│   └── generator.py                    # สคริปต์สร้าง mock data
+├── Dockerfile                          # สร้าง container สำหรับรัน Streamlit app
+├── docker-compose.yml                  # คอนฟิกการรัน Docker Compose
+├── requirements.txt                    # รายการ dependency ของ Python
+├── README.md                           # ไฟล์นี้
+└── Report.pdf                          # รายงาน/เอกสารประกอบโปรเจกต์
 ```
 
 ## รายการ Library ที่ใช้ (requirements.txt)
