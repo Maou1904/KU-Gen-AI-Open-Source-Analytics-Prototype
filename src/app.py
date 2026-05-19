@@ -392,9 +392,6 @@ st.markdown(
     "<div class='title-top'>University Insights</div>"
     "<div class='subtitle-top'>Dashboard for AI usage and academic analytics</div>"
     "</div>"
-    "<div class='right'>"
-    "<button class='dashboard-button'>Download Reports</button>"
-    "</div>"
     "</div>",
     unsafe_allow_html=True,
 )
