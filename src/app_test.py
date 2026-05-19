@@ -1,3 +1,4 @@
+import datetime
 import json
 
 import pandas as pd
@@ -20,35 +21,49 @@ st.markdown(
     """
     <style>
         :root {
-            color-scheme: light;
+            color-scheme: dark;
         }
         body {
-            background: linear-gradient(180deg, #f0f9f4 0%, #e8f7ec 100%);
+            background: radial-gradient(circle at top left, #0f2a16 0%, #081407 45%, #061005 100%);
+            color: #e7f8e9;
         }
         .stApp {
             background: transparent;
+            color: #e7f8e9;
         }
         .css-18e3th9 {
-            background-color: rgba(255, 255, 255, 0.9);
+            background-color: rgba(8, 20, 10, 0.92);
+            color: #e7f8e9;
         }
         .css-1d391kg {
-            background-color: #edf7ed;
+            background-color: rgba(12, 34, 16, 0.94);
         }
         .stButton>button {
-            background-color: #1f7a3d;
+            background-color: #1b5f2b;
             color: white;
+            border-color: #2d7e44;
         }
         .stSidebar {
-            background-image: linear-gradient(180deg, #e8f7ec 0%, #d8efd9 100%);
+            background: linear-gradient(180deg, #081407 0%, #0b3118 100%);
+            color: #d9f3d0;
         }
         .st-bf {
-            background-color: #ffffffcc;
+            background-color: rgba(11, 29, 14, 0.92);
         }
         .css-1dq8tca {
-            background-color: #e1f1df;
+            background-color: rgba(16, 54, 24, 0.9);
         }
         .css-1khjlqm {
-            color: #165b2e;
+            color: #b8e5b1;
+        }
+        .css-1x5yf0l, .css-jn99sy, .css-1n8q08o {
+            color: #e7f8e9;
+        }
+        .stMarkdown h1, .stMarkdown h2, .stMarkdown h3, .stMarkdown h4 {
+            color: #c6f0c5;
+        }
+        .stDataFrame td, .stDataFrame th {
+            color: #e9f8e1;
         }
     </style>
     """,
@@ -129,9 +144,15 @@ if not daily_activity_df.empty:
         title="Daily Activity Trend",
         markers=True,
         labels={"Date": "Date", "Count": "Total Events"},
-        color_discrete_sequence=["#2a7f4f"],
+        color_discrete_sequence=["#39b54a"],
+        template="plotly_dark",
     )
-    fig_daily.update_layout(plot_bgcolor="rgba(255,255,255,0.9)", paper_bgcolor="rgba(255,255,255,0.9)")
+    fig_daily.update_layout(
+        plot_bgcolor="rgba(8, 20, 12, 0.75)",
+        paper_bgcolor="rgba(8, 20, 12, 0.85)",
+        font_color="#e7f8e9",
+        legend_bgcolor="rgba(0,0,0,0.2)",
+    )
     row_1_col1.plotly_chart(fig_daily, use_container_width=True)
 else:
     row_1_col1.info("ไม่มีข้อมูลกิจกรรมรายวัน")
@@ -149,9 +170,15 @@ if not daily_token_df.empty:
         y="Tokens",
         title="Daily Token Usage",
         labels={"Date": "Date", "Tokens": "Token Used"},
-        color_discrete_sequence=["#4f9f63"],
+        color_discrete_sequence=["#2dc04d"],
+        template="plotly_dark",
     )
-    fig_token.update_layout(plot_bgcolor="rgba(255,255,255,0.9)", paper_bgcolor="rgba(255,255,255,0.9)")
+    fig_token.update_layout(
+        plot_bgcolor="rgba(8, 20, 12, 0.75)",
+        paper_bgcolor="rgba(8, 20, 12, 0.85)",
+        font_color="#e7f8e9",
+        legend_bgcolor="rgba(0,0,0,0.2)",
+    )
     row_1_col2.plotly_chart(fig_token, use_container_width=True)
 else:
     row_1_col2.info("ไม่มีข้อมูล Token Usage รายวัน")
@@ -168,8 +195,14 @@ if not sentiment_df.empty:
         names="Sentiment",
         values="Count",
         title="Sentiment Distribution",
-        color_discrete_sequence=["#2c8a4d", "#6ba67d", "#b5d6af"],
+        color_discrete_sequence=["#2c8a4d", "#69b26d", "#8dca8f"],
         hole=0.4,
+        template="plotly_dark",
+    )
+    fig_sentiment.update_layout(
+        paper_bgcolor="rgba(8, 20, 12, 0.85)",
+        font_color="#e7f8e9",
+        legend_bgcolor="rgba(0,0,0,0.2)",
     )
     row_2_col1.plotly_chart(fig_sentiment, use_container_width=True)
 else:
@@ -189,10 +222,16 @@ if not status_df.empty:
         text="Count",
         title="Transaction Status Breakdown",
         color="Status",
-        color_discrete_sequence=["#2a7f4f", "#6ebf6d", "#afdbaf"],
+        color_discrete_sequence=["#2a7f4f", "#6ebf6d", "#8ccf91"],
+        template="plotly_dark",
     )
     fig_status.update_traces(textposition="outside")
-    fig_status.update_layout(plot_bgcolor="rgba(255,255,255,0.9)", paper_bgcolor="rgba(255,255,255,0.9)")
+    fig_status.update_layout(
+        plot_bgcolor="rgba(8, 20, 12, 0.75)",
+        paper_bgcolor="rgba(8, 20, 12, 0.85)",
+        font_color="#e7f8e9",
+        legend_bgcolor="rgba(0,0,0,0.2)",
+    )
     row_2_col2.plotly_chart(fig_status, use_container_width=True)
 else:
     row_2_col2.info("ไม่มีข้อมูลสถานะการทำงาน")
@@ -216,7 +255,14 @@ if not faculty_token_df.empty:
         orientation="h",
         title="Top Faculty Token Usage",
         labels={"TokenUsed": "Token Used", "Faculty": "Faculty"},
-        color_discrete_sequence=["#3c8d4a"],
+        color_discrete_sequence=["#37a44e"],
+        template="plotly_dark",
+    )
+    fig_faculty.update_layout(
+        plot_bgcolor="rgba(8, 20, 12, 0.75)",
+        paper_bgcolor="rgba(8, 20, 12, 0.85)",
+        font_color="#e7f8e9",
+        legend_bgcolor="rgba(0,0,0,0.2)",
     )
     row_3_col1.plotly_chart(fig_faculty, use_container_width=True)
 else:
@@ -236,7 +282,14 @@ if not app_df.empty:
         orientation="h",
         title="Top App Usage",
         labels={"Count": "Usage Count", "AppUsed": "App"},
-        color_discrete_sequence=["#2a7f4f"],
+        color_discrete_sequence=["#39b54a"],
+        template="plotly_dark",
+    )
+    fig_app.update_layout(
+        plot_bgcolor="rgba(8, 20, 12, 0.75)",
+        paper_bgcolor="rgba(8, 20, 12, 0.85)",
+        font_color="#e7f8e9",
+        legend_bgcolor="rgba(0,0,0,0.2)",
     )
     row_3_col2.plotly_chart(fig_app, use_container_width=True)
 else:
@@ -256,6 +309,11 @@ if not tags_df.empty:
         title="Top Tags by Frequency",
         color="Count",
         color_continuous_scale="Greens",
+        template="plotly_dark",
+    )
+    fig_tags.update_layout(
+        paper_bgcolor="rgba(8, 20, 12, 0.85)",
+        font_color="#e7f8e9",
     )
     row_3_col3.plotly_chart(fig_tags, use_container_width=True)
 else:
@@ -266,10 +324,20 @@ st.markdown("---")
 # Detailed analytics section
 st.subheader("Analytics Insights และตัวชี้วัดทั้งหมด")
 
+
+def safe_serialize(value):
+    if isinstance(value, dict):
+        return {str(k): safe_serialize(v) for k, v in value.items()}
+    if isinstance(value, (list, tuple, set)):
+        return [safe_serialize(v) for v in value]
+    if isinstance(value, (datetime.date, datetime.datetime, pd.Timestamp)):
+        return str(value)
+    return value
+
 summary_data = {}
 for key, value in analytics.items():
     if isinstance(value, dict):
-        summary_data[key] = json.dumps(value, ensure_ascii=False, indent=2)
+        summary_data[key] = json.dumps(safe_serialize(value), ensure_ascii=False, indent=2)
     else:
         summary_data[key] = value
 
