@@ -425,7 +425,7 @@ with col_a:
         font_color='#e5e2e1',
         margin=dict(l=0, r=0, t=0, b=0),
     )
-    st.plotly_chart(fig_activity, use_container_width=True, theme='streamlit')
+    st.plotly_chart(fig_activity, width='stretch', theme='streamlit')
 
     st.markdown("<div class='section-header'>Top Faculty Token Usage</div>", unsafe_allow_html=True)
     faculty_usage = pd.DataFrame(
@@ -437,20 +437,21 @@ with col_a:
         x='Tokens',
         y='Faculty',
         orientation='h',
-        color_discrete_sequence=['#3ecf6d'],
+        color='Faculty',
+        color_discrete_sequence=px.colors.qualitative.T10,
         template='plotly_dark',
     )
     fig_faculty.update_layout(
-        height=100*len(faculty_usage),
+        height=50*len(faculty_usage),
         plot_bgcolor='rgba(19,19,19,0.85)',
         paper_bgcolor='rgba(19,19,19,0.85)',
         font_color='#e5e2e1',
         margin=dict(l=0, r=0, t=0, b=0),
     )
-    st.plotly_chart(fig_faculty, use_container_width=True, theme='streamlit')
+    st.plotly_chart(fig_faculty, width='stretch', theme='streamlit')
 
 with col_b:
-    st.markdown(f"<div class='section-header'>Sentiment Distribution ({max(analytics['sentiment_counts'].items(), key=lambda x: x[1])[0].upper()})</div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='section-header'>Sentiment Distribution</div>", unsafe_allow_html=True)
     sentiment_df = pd.DataFrame(
         list(analytics['sentiment_counts'].items()), columns=['Sentiment', 'Count']
     )
@@ -459,6 +460,7 @@ with col_b:
         names='Sentiment',
         values='Count',
         hole=0.45,
+        color='Sentiment',
         color_discrete_sequence=['#00ff41', '#6fbf83', '#ff8a8a'],
         template='plotly_dark',
     )
@@ -469,7 +471,7 @@ with col_b:
         margin=dict(l=0, r=0, t=40, b=0),
         legend=dict(bgcolor='rgba(0,0,0,0)'),
     )
-    st.plotly_chart(fig_sentiment, use_container_width=True, theme='streamlit')
+    st.plotly_chart(fig_sentiment, width='stretch', theme='streamlit')
 
     st.markdown(f"<div class='section-header'>Top App Usage</div>", unsafe_allow_html=True)
     app_usage = pd.DataFrame(
@@ -481,17 +483,18 @@ with col_b:
         x='Count',
         y='App',
         orientation='h',
-        color_discrete_sequence=['#00e639'],
+        color='App',
+        color_discrete_sequence=px.colors.qualitative.Pastel,
         template='plotly_dark',
     )
     fig_apps.update_layout(
-        height=100*len(app_usage),
+        height=50*len(app_usage),
         plot_bgcolor='rgba(19,19,19,0.85)',
         paper_bgcolor='rgba(19,19,19,0.85)',
         font_color='#e5e2e1',
         margin=dict(l=0, r=0, t=0, b=0),
     )
-    st.plotly_chart(fig_apps, use_container_width=True, theme='streamlit')
+    st.plotly_chart(fig_apps, width='stretch', theme='streamlit')
 
 st.markdown("---")
 
@@ -532,7 +535,7 @@ st.markdown("---")
 # Raw or summary data
 if include_raw:
     st.subheader("Filtered Raw Data")
-    st.dataframe(filtered_df, use_container_width=True)
+    st.dataframe(filtered_df, width='stretch')
 
 # Summary table
 summary_data = {}
@@ -549,4 +552,4 @@ summary_df.index.name = 'Metric'
 summary_df = summary_df.reset_index()
 
 st.markdown("<div class='section-header'>Analytics Summary</div>", unsafe_allow_html=True)
-st.dataframe(summary_df, use_container_width=True)
+st.dataframe(summary_df, width='stretch')
