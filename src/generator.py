@@ -14,7 +14,6 @@ FACULTIES = {
 }
 ROLES = ["Student", "Staff", "Faculty", "Lecturer"]
 APPS = ["ChatGPT Chatflow for Education", "Gemini DeepResearch v1", "KIN Perplexity Chatflow"]
-DEVICES = ["Desktop", "Mobile", "Tablet"]
 
 TAGS_POOLS = {
     "Computer Science": [
