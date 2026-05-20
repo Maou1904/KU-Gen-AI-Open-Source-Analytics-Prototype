@@ -8,7 +8,7 @@ import streamlit as st
 from analytics import run_analytics_pipeline, compute_analytics_from_df
 
 st.set_page_config(
-    page_title="University Insights Dashboard",
+    page_title="KU Gen AI Dashboard",
     page_icon="🟢",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -211,7 +211,7 @@ def load_analytics():
 analytics, df = load_analytics()
 
 # Sidebar filters
-st.sidebar.markdown("## University Insights")
+st.sidebar.markdown("## KU Gen AI Analytics Dashboard")
 st.sidebar.markdown("---")
 selected_campus = st.sidebar.selectbox(
     "Campus",
