@@ -3,7 +3,6 @@ from textblob import TextBlob
 
 
 def analyze_sentiment(text):
-    #No Top-up
     if not isinstance(text, str) or text == "Top-up":
         return "Neutral"
     
@@ -139,7 +138,6 @@ def compute_analytics_from_df(df: pd.DataFrame) -> dict:
     This mirrors the calculations in run_analytics_pipeline but does not read/write files.
     """
     df = df.copy()
-    # ensure Timestamp is datetime
     if not pd.api.types.is_datetime64_any_dtype(df["Timestamp"]):
         df["Timestamp"] = pd.to_datetime(df["Timestamp"])
 

@@ -83,8 +83,6 @@ def generate_mock_data(num_records=1200):
         else:
             education_level = "อาจารย์ / บุคลากร"
         
-        # 2.4 ลอจิกการแบ่งประเภทธุรกรรม (Usage vs Top-up)
-        # TODO: สุ่มเลือกว่าแถวนี้จะเป็นการใช้งาน AI หรือการเติมเงิน
         transaction_type = random.choices(["Usage", "Top-up"], weights=[0.9, 0.1])[0]
         if transaction_type == "Top-up":
             msg = "Top-up"
