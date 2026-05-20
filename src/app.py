@@ -389,7 +389,7 @@ period_activity = build_period_activity(filtered_df, selected_frequency)
 st.markdown(
     "<div class='dashboard-header'>"
     "<div class='left'>"
-    "<div class='title-top'>University Insights</div>"
+    "<div class='title-top'>KU Gen AI Analytics Dashboard</div>"
     "<div class='subtitle-top'>Dashboard for AI usage and academic analytics</div>"
     "</div>"
     "</div>",
