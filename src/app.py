@@ -363,6 +363,9 @@ analytics = compute_analytics_from_df(filtered_df)
 
 
 def build_period_activity(df: pd.DataFrame, frequency: str) -> pd.DataFrame:
+    df = df.copy()
+    df["Timestamp"] = pd.to_datetime(df["Timestamp"], errors="coerce")
+
     if frequency == "Daily":
         series = df.groupby(df["Timestamp"].dt.date).size()
         period_df = series.reset_index(name="Records")
@@ -372,11 +375,11 @@ def build_period_activity(df: pd.DataFrame, frequency: str) -> pd.DataFrame:
         period_df = series.reset_index(name="Records")
         period_df["Date"] = period_df["Timestamp"].dt.to_period("W").dt.start_time
     elif frequency == "Monthly":
-        series = df.groupby(pd.Grouper(key="Timestamp", freq="M")).size()
+        series = df.groupby(pd.Grouper(key="Timestamp", freq="ME")).size()
         period_df = series.reset_index(name="Records")
         period_df["Date"] = period_df["Timestamp"].dt.to_period("M").dt.to_timestamp()
     else:
-        series = df.groupby(pd.Grouper(key="Timestamp", freq="Y")).size()
+        series = df.groupby(pd.Grouper(key="Timestamp", freq="YE")).size()
         period_df = series.reset_index(name="Records")
         period_df["Date"] = period_df["Timestamp"].dt.to_period("Y").dt.to_timestamp()
 
@@ -423,7 +426,7 @@ metric_1.markdown(
 )
 metric_2.markdown(
     "<div class='metric-card card-border-left'>"
-    "<div class='metric-label'>Unique Users</div>"
+    "<div class='metric-label'>Users</div>"
     f"<div class='metric-value'>{analytics['unique_users']:,}</div>"
     "<div class='metric-note'>User identities tracked</div>"
     "</div>",
