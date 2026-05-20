@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   ku-gen-ai-dashboard:
     build: .
