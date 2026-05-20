@@ -474,12 +474,21 @@ with col_a:
         margin=dict(l=0, r=0, t=0, b=0),
     )
     st.plotly_chart(fig_activity, width='stretch', theme='streamlit')
+    
+    if selected_transaction == "Top-up":
+        header_text = "Top Faculty Token Top-up"
+        x_label = "Total Tokens Top-up"
+    else:
+        header_text = "Top Faculty Token Usage"
+        x_label = "Total Tokens Used"
 
-    st.markdown("<div class='section-header'>Top Faculty Token Usage</div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='section-header'>{header_text}</div>", unsafe_allow_html=True)
+
     faculty_usage = pd.DataFrame(
         list(analytics['top_faculty_token_usage'].items()), columns=['Faculty', 'Tokens']
     )
     faculty_usage = faculty_usage.sort_values('Tokens', ascending=False).head(6)
+
     fig_faculty = px.bar(
         faculty_usage,
         x='Tokens',
@@ -488,15 +497,20 @@ with col_a:
         color='Faculty',
         color_discrete_sequence=px.colors.qualitative.T10,
         template='plotly_dark',
+        labels={'Tokens': x_label, 'Faculty': 'Faculty'} # เปลี่ยนชื่อแกน X ตามตัวแปรที่เช็คไว้
     )
+
     fig_faculty.update_layout(
         height=70*len(faculty_usage),
         plot_bgcolor='rgba(19,19,19,0.85)',
         paper_bgcolor='rgba(19,19,19,0.85)',
         font_color='#e5e2e1',
         margin=dict(l=0, r=0, t=0, b=0),
+        yaxis={'categoryorder':'total ascending'} # ช่วยให้แท่งที่ค่าเยอะที่สุดอยู่บนสุดเสมอ
     )
+
     st.plotly_chart(fig_faculty, width='stretch', theme='streamlit')
+
 
 with col_b:
     st.markdown(f"<div class='section-header'>Sentiment Distribution</div>", unsafe_allow_html=True)
@@ -521,28 +535,29 @@ with col_b:
     )
     st.plotly_chart(fig_sentiment, width='stretch', theme='streamlit')
 
-    st.markdown(f"<div class='section-header'>Top App Usage</div>", unsafe_allow_html=True)
-    app_usage = pd.DataFrame(
-        list(analytics['app_usage_counts'].items()), columns=['App', 'Count']
-    )
-    app_usage = app_usage.sort_values('Count', ascending=False).head(6)
-    fig_apps = px.bar(
-        app_usage,
-        x='Count',
-        y='App',
-        orientation='h',
-        color='App',
-        color_discrete_sequence=px.colors.qualitative.Pastel,
-        template='plotly_dark',
-    )
-    fig_apps.update_layout(
-        height=70*len(app_usage),
-        plot_bgcolor='rgba(19,19,19,0.85)',
-        paper_bgcolor='rgba(19,19,19,0.85)',
-        font_color='#e5e2e1',
-        margin=dict(l=0, r=0, t=0, b=0),
-    )
-    st.plotly_chart(fig_apps, width='stretch', theme='streamlit')
+    if selected_transaction != "Top-up":
+        st.markdown(f"<div class='section-header'>Top App Usage</div>", unsafe_allow_html=True)
+        app_usage = pd.DataFrame(
+            list(analytics['app_usage_counts'].items()), columns=['App', 'Count']
+        )
+        app_usage = app_usage.sort_values('Count', ascending=False).head(6)
+        fig_apps = px.bar(
+            app_usage,
+            x='Count',
+            y='App',
+            orientation='h',
+            color='App',
+            color_discrete_sequence=px.colors.qualitative.Pastel,
+            template='plotly_dark',
+        )
+        fig_apps.update_layout(
+            height=70*len(app_usage),
+            plot_bgcolor='rgba(19,19,19,0.85)',
+            paper_bgcolor='rgba(19,19,19,0.85)',
+            font_color='#e5e2e1',
+            margin=dict(l=0, r=0, t=0, b=0),
+        )
+        st.plotly_chart(fig_apps, width='stretch', theme='streamlit')
 
 st.markdown("---")
 
