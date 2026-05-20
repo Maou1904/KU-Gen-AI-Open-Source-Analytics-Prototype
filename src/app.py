@@ -17,111 +17,113 @@ st.set_page_config(
 st.markdown(
     """
     <style>
-        :root {
-            color-scheme: dark;
-            font-family: Inter, sans-serif;
-        }
-
-        body {
+        html, body, [data-testid="stAppViewContainer"], [data-testid="stMain"] {
             background: #131313;
             color: #e5e2e1;
-        }
-
-        .stApp {
-            background: #131313;
+            color-scheme: dark;
+            font-family: Inter, sans-serif;
+            overflow-y: auto !important; /* ปล่อยให้เลื่อนได้ตามธรรมชาติ */
         }
 
         .main .block-container {
-            padding-top: 24px;
-            padding-left: 24px;
-            padding-right: 24px;
-            padding-bottom: 32px;
+            padding-top: 16px !important;
+            padding-left: 24px !important;
+            padding-right: 24px !important;
+            padding-bottom: 16px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: flex-start !important;
+            gap: 4px !important;
+            min-height: 800px !important; /* ความสูงเซฟโซน ถ้าจอตื้นกว่านี้จะเกิด Scrollbar */
         }
 
-        .glass-panel {
-            background: rgba(32, 31, 31, 0.85);
-            border: 1px solid rgba(88, 176, 98, 0.18);
-            border-radius: 16px;
-            backdrop-filter: blur(18px);
-            box-shadow: 0 20px 80px rgba(0, 0, 0, 0.25);
+        @media screen and (min-height: 801px) {
+            html, body, [data-testid="stAppViewContainer"], [data-testid="stMain"] {
+                max-height: 100vh !important;
+                height: 100vh !important;
+                overflow: hidden !important; /* ซ่อนสกรอลบาร์ */
+            }
+            .main .block-container {
+                height: 100vh !important;
+                max-height: 100vh !important;
+                overflow: hidden !important;
+            }
         }
 
-        .neon-border {
-            border: 1px solid rgba(0, 230, 57, 0.4);
-            box-shadow: 0 0 20px rgba(0, 230, 57, 0.12);
-        }
+        div[data-testid="stVerticalBlock"] { gap: 8px !important; }
+        div[data-testid="element-container"] { margin-bottom: 0px !important; }
+        hr { margin: 0.5em 0 !important; }
 
         .title-top {
             color: #e5e2e1;
-            font-size: 3rem;
+            font-size: 2.2rem !important;
             font-weight: 700;
             letter-spacing: -0.03em;
+            line-height: 1.1;
         }
 
         .subtitle-top {
             color: #b9ccb2;
-            font-size: 1rem;
-            margin-top: 0.5rem;
+            font-size: 0.9rem !important;
+            margin-top: 0.2rem;
         }
 
         .metric-card {
             background: rgba(20, 24, 18, 0.85);
             border: 1px solid rgba(0, 230, 57, 0.15);
-            border-radius: 18px;
-            padding: 24px;
+            border-radius: 12px !important;
+            padding: 12px 16px !important;
             color: #e5e2e1;
+            margin-bottom: 16px !important;
+            margin-top: 16px !important;
         }
 
         .metric-label {
             color: #b9ccb2;
-            font-size: 0.95rem;
-            margin-bottom: 0.5rem;
+            font-size: 0.85rem !important;
+            margin-bottom: 0.2rem !important;
         }
 
         .metric-value {
             color: #ebffe2;
-            font-size: 2.5rem;
+            font-size: 1.8rem !important;
             font-weight: 700;
             line-height: 1.1;
         }
 
         .metric-note {
             color: #94b986;
-            margin-top: 0.75rem;
-            font-size: 0.95rem;
+            margin-top: 0.4rem !important;
+            font-size: 0.8rem !important;
         }
 
         .card-border-left {
             border-left: 4px solid #00ff41;
-            padding-left: 18px;
-        }
-
-        .chart-card {
-            padding: 24px;
+            padding-left: 14px !important;
         }
 
         .section-header {
             color: #e5e2e1;
-            margin-bottom: 16px;
-            font-size: 1.25rem;
+            margin-bottom: 4px !important;
+            font-size: 1.05rem !important;
             font-weight: 700;
         }
 
         .small-pill {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 8px 12px;
+            gap: 6px;
+            padding: 4px 10px;
             border-radius: 999px;
             background: rgba(0, 230, 57, 0.08);
             border: 1px solid rgba(0, 230, 57, 0.18);
             color: #c8c6c5;
-            font-size: 0.86rem;
+            font-size: 0.8rem !important;
         }
 
         .pill-dot {
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
             border-radius: 999px;
             background: #00ff41;
         }
@@ -130,58 +132,7 @@ st.markdown(
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            gap: 16px;
-            flex-wrap: wrap;
-            margin-bottom: 24px;
-        }
-
-        .dashboard-header .left {
-            max-width: 680px;
-        }
-
-        .dashboard-header .right {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        .dashboard-button {
-            background: linear-gradient(135deg, rgba(0, 255, 65, 0.16), rgba(0, 255, 65, 0.04));
-            border: 1px solid rgba(0, 255, 65, 0.18);
-            color: #e5e2e1;
-            padding: 12px 20px;
-            border-radius: 999px;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        .dashboard-button:hover {
-            background: rgba(0, 255, 65, 0.16);
-        }
-
-        .custom-legend {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 16px;
-        }
-
-        .custom-legend div {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-        }
-
-        .custom-legend span:first-child {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            color: #e5e2e1;
-        }
-
-        .custom-legend strong {
-            color: #b9ccb2;
+            margin-bottom: 8px !important;
         }
 
         .flex-inline {
@@ -190,11 +141,11 @@ st.markdown(
             align-items: center;
             flex-wrap: wrap;
         }
+        
         .text-Bold {
             color: #00d900;
-            font-size: 1.2rem;
+            font-size: 1rem !important;
             font-weight: 800;
-            letter-spacing: -0.02em;
             margin-right: 8px;
         }
     </style>
@@ -202,7 +153,6 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-#@st.cache_data(show_spinner=False)
 def load_analytics():
     analytics = run_analytics_pipeline()
     df = pd.read_csv("data/processed_analytics_data.csv", parse_dates=["Timestamp"])
@@ -210,162 +160,70 @@ def load_analytics():
 
 analytics, df = load_analytics()
 
-# Sidebar filters
+# ================= Sidebar =================
 st.sidebar.markdown("## KU Gen AI Analytics Dashboard")
 st.sidebar.markdown("---")
-selected_campus = st.sidebar.selectbox(
-    "Campus",
-    options=["All"] + sorted(df["Campus"].dropna().unique().tolist()),
-    index=0,
-    key="selected_campus",
-)
-selected_faculty = st.sidebar.selectbox(
-    "Faculty",
-    options=["All"] + sorted(df["Faculty"].dropna().unique().tolist()),
-    index=0,
-    key="selected_faculty",
-)
+selected_campus = st.sidebar.selectbox("Campus", options=["All"] + sorted(df["Campus"].dropna().unique().tolist()), index=0)
+selected_faculty = st.sidebar.selectbox("Faculty", options=["All"] + sorted(df["Faculty"].dropna().unique().tolist()), index=0)
 
-# Get departments for selected faculty
 if selected_faculty == "All":
     available_departments = sorted(df["Department"].dropna().unique().tolist())
 else:
     available_departments = sorted(df[df["Faculty"] == selected_faculty]["Department"].dropna().unique().tolist())
 
-selected_department = st.sidebar.selectbox(
-    "Department",
-    options=["All"] + available_departments,
-    index=0,
-    key="selected_department",
-)
-
-selected_role = st.sidebar.selectbox(
-    "Role",
-    options=["All"] + sorted(df["Role"].dropna().unique().tolist()),
-    index=0,
-    key="selected_role",
-)
-
-selected_transaction = st.sidebar.selectbox(
-    "Transaction Type",
-    options=["All"] + sorted(df["TransactionType"].dropna().unique().tolist()),
-)
-
-selected_frequency = st.sidebar.radio(
-    "Time Granularity",
-    options=["Daily", "Weekly", "Monthly", "Yearly"],
-    index=0,
-)
+selected_department = st.sidebar.selectbox("Department", options=["All"] + available_departments, index=0)
+selected_role = st.sidebar.selectbox("Role", options=["All"] + sorted(df["Role"].dropna().unique().tolist()), index=0)
+selected_transaction = st.sidebar.selectbox("Transaction Type", options=["All"] + sorted(df["TransactionType"].dropna().unique().tolist()))
+selected_frequency = st.sidebar.radio("Time Granularity", options=["Daily", "Weekly", "Monthly", "Yearly"], index=0)
 
 min_date = df["Timestamp"].dt.date.min()
 max_date = df["Timestamp"].dt.date.max()
 
 if selected_frequency == "Daily":
-    selected_date_range = st.sidebar.date_input(
-        "Date Range",
-        value=(min_date, max_date),
-        min_value=min_date,
-        max_value=max_date,
-        help="Choose a start and end date for the dashboard",
-    )
+    selected_date_range = st.sidebar.date_input("Date Range", value=(min_date, max_date), min_value=min_date, max_value=max_date)
     if isinstance(selected_date_range, (list, tuple)) and len(selected_date_range) == 2:
         start_date, end_date = selected_date_range
     else:
         start_date, end_date = min_date, max_date
-
 elif selected_frequency == "Weekly":
-    week_options = pd.date_range(
-        start=min_date - datetime.timedelta(days=min_date.weekday()),
-        end=max_date,
-        freq="W-MON",
-    ).date
-    selected_week_start = st.sidebar.selectbox(
-        "Start week",
-        options=week_options,
-        index=0,
-        format_func=lambda d: d.strftime("%Y-%m-%d"),
-        key="selected_week_start",
-    )
-    selected_week_end = st.sidebar.selectbox(
-        "End week",
-        options=week_options,
-        index=len(week_options) - 1,
-        format_func=lambda d: d.strftime("%Y-%m-%d"),
-        key="selected_week_end",
-    )
+    week_options = pd.date_range(start=min_date - datetime.timedelta(days=min_date.weekday()), end=max_date, freq="W-MON").date
+    selected_week_start = st.sidebar.selectbox("Start week", options=week_options, index=0, format_func=lambda d: d.strftime("%Y-%m-%d"))
+    selected_week_end = st.sidebar.selectbox("End week", options=week_options, index=len(week_options) - 1, format_func=lambda d: d.strftime("%Y-%m-%d"))
     start_date = selected_week_start
     end_date = selected_week_end + datetime.timedelta(days=6)
-
 elif selected_frequency == "Monthly":
-    month_options = pd.date_range(
-        start=min_date.replace(day=1),
-        end=max_date.replace(day=1),
-        freq="MS",
-    ).date
-    selected_month_start = st.sidebar.selectbox(
-        "Start month",
-        options=month_options,
-        index=0,
-        format_func=lambda d: d.strftime("%Y-%m"),
-        key="selected_month_start",
-    )
-    selected_month_end = st.sidebar.selectbox(
-        "End month",
-        options=month_options,
-        index=len(month_options) - 1,
-        format_func=lambda d: d.strftime("%Y-%m"),
-        key="selected_month_end",
-    )
+    month_options = pd.date_range(start=min_date.replace(day=1), end=max_date.replace(day=1), freq="MS").date
+    selected_month_start = st.sidebar.selectbox("Start month", options=month_options, index=0, format_func=lambda d: d.strftime("%Y-%m"))
+    selected_month_end = st.sidebar.selectbox("End month", options=month_options, index=len(month_options) - 1, format_func=lambda d: d.strftime("%Y-%m"))
     start_date = selected_month_start
     end_date = (pd.Timestamp(selected_month_end) + pd.offsets.MonthEnd(0)).date()
-
 else:
     year_options = sorted(df["Timestamp"].dt.year.unique())
-    selected_year_start = st.sidebar.selectbox(
-        "Start year",
-        options=year_options,
-        index=0,
-        key="selected_year_start",
-    )
-    selected_year_end = st.sidebar.selectbox(
-        "End year",
-        options=year_options,
-        index=len(year_options) - 1,
-        key="selected_year_end",
-    )
+    selected_year_start = st.sidebar.selectbox("Start year", options=year_options, index=0)
+    selected_year_end = st.sidebar.selectbox("End year", options=year_options, index=len(year_options) - 1)
     start_date = datetime.date(selected_year_start, 1, 1)
     end_date = datetime.date(selected_year_end, 12, 31)
 
 if start_date > end_date:
     start_date, end_date = end_date, start_date
 
-include_raw = st.sidebar.checkbox("Show raw data", value=False, key="include_raw")
+include_raw = st.sidebar.checkbox("Show raw data (in Sidebar)", value=False)
 
+# ================= Filter Data =================
 filtered_df = df.copy()
+if selected_campus != "All": filtered_df = filtered_df[filtered_df["Campus"] == selected_campus]
+if selected_faculty != "All": filtered_df = filtered_df[filtered_df["Faculty"] == selected_faculty]
+if selected_department != "All": filtered_df = filtered_df[filtered_df["Department"] == selected_department]
+if selected_role != "All": filtered_df = filtered_df[filtered_df["Role"] == selected_role]
+if selected_transaction != "All": filtered_df = filtered_df[filtered_df["TransactionType"] == selected_transaction]
 
-if selected_campus != "All":
-    filtered_df = filtered_df[filtered_df["Campus"] == selected_campus]
-if selected_faculty != "All":
-    filtered_df = filtered_df[filtered_df["Faculty"] == selected_faculty]
-if selected_department != "All":
-    filtered_df = filtered_df[filtered_df["Department"] == selected_department]
-if selected_role != "All":
-    filtered_df = filtered_df[filtered_df["Role"] == selected_role]
-if selected_transaction != "All":
-    filtered_df = filtered_df[filtered_df["TransactionType"] == selected_transaction]
-
-filtered_df = filtered_df[
-    (filtered_df["Timestamp"].dt.date >= start_date)
-    & (filtered_df["Timestamp"].dt.date <= end_date)
-]
+filtered_df = filtered_df[(filtered_df["Timestamp"].dt.date >= start_date) & (filtered_df["Timestamp"].dt.date <= end_date)]
 
 analytics = compute_analytics_from_df(filtered_df)
-
 
 def build_period_activity(df: pd.DataFrame, frequency: str) -> pd.DataFrame:
     df = df.copy()
     df["Timestamp"] = pd.to_datetime(df["Timestamp"], errors="coerce")
-
     if frequency == "Daily":
         series = df.groupby(df["Timestamp"].dt.date).size()
         period_df = series.reset_index(name="Records")
@@ -382,232 +240,95 @@ def build_period_activity(df: pd.DataFrame, frequency: str) -> pd.DataFrame:
         series = df.groupby(pd.Grouper(key="Timestamp", freq="YE")).size()
         period_df = series.reset_index(name="Records")
         period_df["Date"] = period_df["Timestamp"].dt.to_period("Y").dt.to_timestamp()
-
     return period_df
 
 period_activity = build_period_activity(filtered_df, selected_frequency)
 
-
-# Header
+# ================= Header & Topics =================
 st.markdown(
     "<div class='dashboard-header'>"
     "<div class='left'>"
-    "<div class='title-top'>KU Gen AI Analytics Dashboard</div>"
+    "<div class='title-top'>KU Gen AI Analytics</div>"
     "<div class='subtitle-top'>Dashboard for AI usage and academic analytics</div>"
-    "</div>"
-    "</div>",
+    "</div></div>",
     unsafe_allow_html=True,
 )
 
+topics = "".join([f"<div class='small-pill'><span class='pill-dot'></span>{_}</div>" for _ in list(analytics['top_tags'].keys())[:5]])
+st.markdown(f"<div class='flex-inline'><div class='text-Bold'>Top Topics</div>{topics}</div>", unsafe_allow_html=True)
 
+# Faculty Graph (Dynamic Top-up/Usage)
+if selected_transaction == "Top-up":
+    header_text = "Top Faculty Token Top-up"
+    x_label = "Total Tokens Top-up"
+else:
+    header_text = "Top Faculty Token Usage"
+    x_label = "Total Tokens Used"
 
-topics = ""
+# ================= Top Metrics =================
+m1, m2, m3, m4 = st.columns(4)
+m1.markdown(f"<div class='metric-card card-border-left'><div class='metric-label'>Total Records</div><div class='metric-value'>{analytics['total_records']:,}</div></div>", unsafe_allow_html=True)
+m2.markdown(f"<div class='metric-card card-border-left'><div class='metric-label'>Users</div><div class='metric-value'>{analytics['unique_users']:,}</div></div>", unsafe_allow_html=True)
+m3.markdown(f"<div class='metric-card card-border-left'><div class='metric-label'>Success Rate</div><div class='metric-value'>{analytics['success_rate']:.2%}</div></div>", unsafe_allow_html=True)
+m4.markdown(f"<div class='metric-card card-border-left'><div class='metric-label'>{x_label}</div><div class='metric-value'>{analytics['total_token_used']:,}</div></div>", unsafe_allow_html=True)
 
-for _ in list(analytics['top_tags'].keys())[:5]:
-    topics += f"<div class='small-pill'><span class='pill-dot'></span>{_}</div>\n"
-
-st.markdown(f"""
-<div class='flex-inline'>
-    <div class='text-Bold'>Top Topics</div>
-    {topics}
-</div>
-""", unsafe_allow_html=True)
-st.markdown("---")
-
-# Top metrics
-metric_1, metric_2, metric_3, metric_4 = st.columns(4)
-metric_1.markdown(
-    "<div class='metric-card card-border-left'>"
-    "<div class='metric-label'>Total Records</div>"
-    f"<div class='metric-value'>{analytics['total_records']:,}</div>"
-    "<div class='metric-note'>Data points collected</div>"
-    "</div>",
-    unsafe_allow_html=True,
-)
-metric_2.markdown(
-    "<div class='metric-card card-border-left'>"
-    "<div class='metric-label'>Users</div>"
-    f"<div class='metric-value'>{analytics['unique_users']:,}</div>"
-    "<div class='metric-note'>User identities tracked</div>"
-    "</div>",
-    unsafe_allow_html=True,
-)
-metric_3.markdown(
-    "<div class='metric-card card-border-left'>"
-    "<div class='metric-label'>Success Rate</div>"
-    f"<div class='metric-value'>{analytics['success_rate']:.2%}</div>"
-    "<div class='metric-note'>System reliability</div>"
-    "</div>",
-    unsafe_allow_html=True,
-)
-metric_4.markdown(
-    "<div class='metric-card card-border-left'>"
-    "<div class='metric-label'>Total Token Usage</div>"
-    f"<div class='metric-value'>{analytics['total_token_used']:,}</div>"
-    "<div class='metric-note'>Total tokens used</div>"
-    "</div>",
-    unsafe_allow_html=True,
-)
-
-st.markdown("---")
-
-# Charts layout
+# ================= Charts Layout =================
 col_a, col_b = st.columns([1.2, 1])
+
+# --- Column A: Trend & Faculty ---
 with col_a:
-    st.markdown(
-        f"<div class='section-header'>{selected_frequency} Activity & Usage Trend</div>",
-        unsafe_allow_html=True,
-    )
-    period_activity['Date'] = pd.to_datetime(period_activity['Date'])
-    fig_activity = px.line(
-        period_activity,
-        x='Date',
-        y='Records',
-        markers=True,
-        color_discrete_sequence=['#00ff41'],
-        template='plotly_dark',
-    )
-    fig_activity.update_layout(
-        plot_bgcolor='rgba(19,19,19,0.85)',
-        paper_bgcolor='rgba(19,19,19,0.85)',
-        font_color='#e5e2e1',
-        margin=dict(l=0, r=0, t=0, b=0),
-    )
-    st.plotly_chart(fig_activity, width='stretch', theme='streamlit')
-    
-    if selected_transaction == "Top-up":
-        header_text = "Top Faculty Token Top-up"
-        x_label = "Total Tokens Top-up"
+    st.markdown(f"<div class='section-header'>{selected_frequency} Activity Trend</div>", unsafe_allow_html=True)
+    if not period_activity.empty:
+        period_activity['Date'] = pd.to_datetime(period_activity['Date'])
+        fig_activity = px.line(period_activity, x='Date', y='Records', markers=True, color_discrete_sequence=['#00ff41'], template='plotly_dark')
+        fig_activity.update_layout(height=220, plot_bgcolor='rgba(19,19,19,0.85)', paper_bgcolor='rgba(19,19,19,0.85)', font_color='#e5e2e1', margin=dict(l=0, r=0, t=10, b=0))
+        st.plotly_chart(fig_activity, width='stretch', theme='streamlit')
     else:
-        header_text = "Top Faculty Token Usage"
-        x_label = "Total Tokens Used"
+        st.info("No activity data available.")
+
+    
 
     st.markdown(f"<div class='section-header'>{header_text}</div>", unsafe_allow_html=True)
-
-    faculty_usage = pd.DataFrame(
-        list(analytics['top_faculty_token_usage'].items()), columns=['Faculty', 'Tokens']
-    )
+    faculty_usage = pd.DataFrame(list(analytics['top_faculty_token_usage'].items()), columns=['Faculty', 'Tokens'])
     faculty_usage = faculty_usage.sort_values('Tokens', ascending=False).head(6)
 
-    fig_faculty = px.bar(
-        faculty_usage,
-        x='Tokens',
-        y='Faculty',
-        orientation='h',
-        color='Faculty',
-        color_discrete_sequence=px.colors.qualitative.T10,
-        template='plotly_dark',
-        labels={'Tokens': x_label, 'Faculty': 'Faculty'} # เปลี่ยนชื่อแกน X ตามตัวแปรที่เช็คไว้
-    )
+    if faculty_usage.empty:
+        st.info("No transaction data available for the selected filters.")
+    else:
+        fig_faculty = px.bar(faculty_usage, x='Tokens', y='Faculty', orientation='h', color='Faculty', color_discrete_sequence=px.colors.qualitative.T10, template='plotly_dark', labels={'Tokens': x_label, 'Faculty': 'Faculty'})
+        fig_faculty.update_layout(height=220, plot_bgcolor='rgba(19,19,19,0.85)', paper_bgcolor='rgba(19,19,19,0.85)', font_color='#e5e2e1', margin=dict(l=0, r=0, t=10, b=0), yaxis={'categoryorder':'total ascending'})
+        st.plotly_chart(fig_faculty, width='stretch', theme='streamlit')
 
-    fig_faculty.update_layout(
-        height=70*len(faculty_usage),
-        plot_bgcolor='rgba(19,19,19,0.85)',
-        paper_bgcolor='rgba(19,19,19,0.85)',
-        font_color='#e5e2e1',
-        margin=dict(l=0, r=0, t=0, b=0),
-        yaxis={'categoryorder':'total ascending'} # ช่วยให้แท่งที่ค่าเยอะที่สุดอยู่บนสุดเสมอ
-    )
-
-    st.plotly_chart(fig_faculty, width='stretch', theme='streamlit')
-
-
+# --- Column B: Sentiment & Apps ---
 with col_b:
     st.markdown(f"<div class='section-header'>Sentiment Distribution</div>", unsafe_allow_html=True)
-    sentiment_df = pd.DataFrame(
-        list(analytics['sentiment_counts'].items()), columns=['Sentiment', 'Count']
-    )
-    fig_sentiment = px.pie(
-        sentiment_df,
-        names='Sentiment',
-        values='Count',
-        hole=0.45,
-        color='Sentiment',
-        color_discrete_sequence=['#00ff41', '#6fbf83', '#ff8a8a'],
-        template='plotly_dark',
-    )
-    fig_sentiment.update_layout(
-        plot_bgcolor='rgba(19,19,19,0.85)',
-        paper_bgcolor='rgba(19,19,19,0.85)',
-        font_color='#e5e2e1',
-        margin=dict(l=0, r=0, t=40, b=0),
-        legend=dict(bgcolor='rgba(0,0,0,0)'),
-    )
-    st.plotly_chart(fig_sentiment, width='stretch', theme='streamlit')
+    sentiment_df = pd.DataFrame(list(analytics['sentiment_counts'].items()), columns=['Sentiment', 'Count'])
+    if not sentiment_df.empty:
+        fig_sentiment = px.pie(sentiment_df, names='Sentiment', values='Count', hole=0.45, color='Sentiment', color_discrete_sequence=['#00ff41', '#6fbf83', '#ff8a8a'], template='plotly_dark')
+        fig_sentiment.update_layout(height=220, plot_bgcolor='rgba(19,19,19,0.85)', paper_bgcolor='rgba(19,19,19,0.85)', font_color='#e5e2e1', margin=dict(l=0, r=0, t=20, b=0), legend=dict(bgcolor='rgba(0,0,0,0)'))
+        st.plotly_chart(fig_sentiment, width='stretch', theme='streamlit')
+    else:
+        st.info("No sentiment data available.")
 
     if selected_transaction != "Top-up":
         st.markdown(f"<div class='section-header'>Top App Usage</div>", unsafe_allow_html=True)
-        app_usage = pd.DataFrame(
-            list(analytics['app_usage_counts'].items()), columns=['App', 'Count']
-        )
+        app_usage = pd.DataFrame(list(analytics['app_usage_counts'].items()), columns=['App', 'Count'])
         app_usage = app_usage.sort_values('Count', ascending=False).head(6)
-        fig_apps = px.bar(
-            app_usage,
-            x='Count',
-            y='App',
-            orientation='h',
-            color='App',
-            color_discrete_sequence=px.colors.qualitative.Pastel,
-            template='plotly_dark',
-        )
-        fig_apps.update_layout(
-            height=70*len(app_usage),
-            plot_bgcolor='rgba(19,19,19,0.85)',
-            paper_bgcolor='rgba(19,19,19,0.85)',
-            font_color='#e5e2e1',
-            margin=dict(l=0, r=0, t=0, b=0),
-        )
-        st.plotly_chart(fig_apps, width='stretch', theme='streamlit')
+        
+        if app_usage.empty:
+            st.info("No app usage data available.")
+        else:
+            fig_apps = px.bar(app_usage, x='Count', y='App', orientation='h', color='App', color_discrete_sequence=px.colors.qualitative.Pastel, template='plotly_dark')
+            fig_apps.update_layout(height=220, plot_bgcolor='rgba(19,19,19,0.85)', paper_bgcolor='rgba(19,19,19,0.85)', font_color='#e5e2e1', margin=dict(l=0, r=0, t=10, b=0), yaxis={'categoryorder':'total ascending'})
+            st.plotly_chart(fig_apps, width='stretch', theme='streamlit')
 
-st.markdown("---")
+# ================= Lower Info Panels =================
+im1, im2, im3 = st.columns(3)
+im1.markdown(f"<div class='metric-card card-border-left'><div class='metric-label'>Total Copies</div><div class='metric-value'>{analytics['copy_count']:,}</div></div>", unsafe_allow_html=True)
+im2.markdown(f"<div class='metric-card card-border-left'><div class='metric-label'>Total Saves</div><div class='metric-value'>{analytics['save_count']:,}</div></div>", unsafe_allow_html=True)
+im3.markdown(f"<div class='metric-card card-border-left'><div class='metric-label'>Total Shares</div><div class='metric-value'>{analytics['share_count']:,}</div></div>", unsafe_allow_html=True)
 
-# Lower info panels
-metric_1, metric_2, metric_3 = st.columns(3)
-metric_1.markdown(
-    "<div class='metric-card card-border-left'>"
-    "<div class='metric-label'>Total Copies</div>"
-    f"<div class='metric-value'>{analytics['copy_count']:,}</div>"
-    "<div class='metric-note'>Data points collected</div>"
-    "</div>",
-    unsafe_allow_html=True,
-)
-metric_2.markdown(
-    "<div class='metric-card card-border-left'>"
-    "<div class='metric-label'>Total Saves</div>"
-    f"<div class='metric-value'>{analytics['save_count']:,}</div>"
-    "<div class='metric-note'>Data points collected</div>"
-    "</div>",
-    unsafe_allow_html=True,
-)
-metric_3.markdown(
-    "<div class='metric-card card-border-left'>"
-    "<div class='metric-label'>Total Shares</div>"
-    f"<div class='metric-value'>{analytics['share_count']:,}</div>"
-    "<div class='metric-note'>Data points collected</div>"
-    "</div>",
-    unsafe_allow_html=True,
-)
-
-st.markdown("---")
-
-# Raw or summary data
+# ================= ตารางข้อมูลดิบและสรุปผล (Sidebar) =================
 if include_raw:
-    st.subheader("Filtered Raw Data")
-    st.dataframe(filtered_df, width='stretch')
-
-# Summary table
-summary_data = {}
-for key, value in analytics.items():
-    if isinstance(value, dict):
-        summary_data[key] = json.dumps({str(k): v for k, v in value.items()}, ensure_ascii=False, indent=2)
-    elif isinstance(value, (datetime.date, datetime.datetime, pd.Timestamp)):
-        summary_data[key] = str(value)
-    else:
-        summary_data[key] = value
-
-summary_df = pd.DataFrame.from_dict(summary_data, orient='index', columns=['Value'])
-summary_df.index.name = 'Metric'
-summary_df = summary_df.reset_index()
-
-st.markdown("<div class='section-header'>Analytics Summary</div>", unsafe_allow_html=True)
-st.dataframe(summary_df, width='stretch')
+    st.sidebar.subheader("Filtered Raw Data")
+    st.sidebar.dataframe(filtered_df, use_container_width=True)
